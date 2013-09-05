@@ -1,5 +1,4 @@
-# Generator-php
-[![Build Status](https://secure.travis-ci.org/Bradleycorn/generator-php.png?branch=master)](https://travis-ci.org/Bradleycorn/generator-php)
+# Generator-php [![Build Status](https://secure.travis-ci.org/Bradleycorn/generator-php.png?branch=master)](https://travis-ci.org/Bradleycorn/generator-php)
 
 A generator for Yeoman, to scaffold a php web site with HTML5 boilerplate, SASS Compass, and optionally Twitter Bootstrap or Zurb Foundation.
 
