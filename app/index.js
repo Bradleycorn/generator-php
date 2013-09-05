@@ -1,0 +1,289 @@
+'use strict';
+var util = require('util');
+var path = require('path');
+var yeoman = require('yeoman-generator');
+
+
+var PhpGenerator = module.exports = function PhpGenerator(args, options, config) {
+  yeoman.generators.Base.apply(this, arguments);
+
+  this.paths = {};
+  this.paths.dev = "app";
+  this.paths.dist = "dist";
+
+  this.on('end', function () {
+    this.installDependencies({ skipInstall: options['skip-install'] });
+  });
+
+  this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
+
+  this.indexFile = this.readFileAsString(path.join(this.sourceRoot(), 'index.php'));
+  this.tailFile = this.readFileAsString(path.join(this.sourceRoot(), '_/inc/tail.php'));
+  this.initFile = this.readFileAsString(path.join(this.sourceRoot(), '_/inc/init.php'));
+  this.headFile = this.readFileAsString(path.join(this.sourceRoot(), '_/inc/head.php'));
+};
+
+util.inherits(PhpGenerator, yeoman.generators.Base);
+
+PhpGenerator.prototype.askFor = function askFor() {
+  var cb = this.async();
+
+  // have Yeoman greet the user.
+  console.log(this.yeoman);
+  console.log('I\'ll be scaffolding out a php website for you.');
+  console.log('Out of the box you\'re going to get:');
+  console.log('- HTML5 Boilerplate'); 
+  console.log('- jQuery (v1.10)');
+  console.log('- Modernizr (v2.6.2)');
+
+  var prompts = [{
+    name: 'siteURL',
+    message: 'What\'s the production URL for this site?',
+  },
+  {
+    name: 'devURL',
+    message: 'and the dev URL?',
+  },
+  {
+    name: 'devPort',
+    message: 'What port should I use for the dev URL?',
+    default: 80
+  },
+  {
+    type: 'confirm',
+    name: 'phpServer',
+    message: 'Use PHP\'s built-in web server for dev testing?',
+    default: false
+  },  
+  {
+    type: 'confirm',
+    name: 'bootstrap',
+    message: 'Include Twitter Bootstrap (v2.3.2)?',
+    default: true
+  },
+  {
+    type: 'confirm',
+    name: 'foundation',
+    message: 'Include Foundation Framework (v3)?',
+    default: false
+  },
+  {
+    name: 'versioning',
+    message: 'Which files should be versioned to force cache expiration (none, all, css, js, img)?',
+    default: 'none'
+  }];
+
+  this.prompt(prompts, function (props) {
+    this.userOpts = {};
+    this.userOpts.siteURL = props.siteURL;
+    this.userOpts.devURL = props.devURL;
+    this.userOpts.devPort = props.devPort;
+    this.userOpts.phpServer = props.phpServer;
+    this.userOpts.bootstrap = props.bootstrap;
+    this.userOpts.foundation = props.foundation;
+
+    //Default file versioning to "off" for all types
+    this.userOpts.revImages = false;
+    this.userOpts.revScripts = false;
+    this.userOpts.revStyles = false;
+    
+    props.versioning = props.versioning.toLowerCase().trim();
+ 
+    if (props.versioning == 'all') {
+      //Enable versioning on all file types
+      this.userOpts.revImages = true;
+      this.userOpts.revScripts = true;
+      this.userOpts.revStyles = true;      
+    } else {
+      //Loop through user input and enable versioning on appropriate file types
+      var fileType, i;
+      var fileTypes = props.versioning.split(',');
+      for(i=0;i<fileTypes.length;i++) {
+        fileType = fileTypes[i].trim();
+        switch (fileType) {
+          case 'css':
+            this.userOpts.revStyles = true;
+            break;
+          case 'js':
+            this.userOpts.revScripts = true;
+            break;
+          case 'img':
+            this.userOpts.revImages = true;
+            break; 
+        }
+      }
+    }
+    cb();
+  }.bind(this));
+};
+
+PhpGenerator.prototype.gruntfile = function gruntfile() {
+  this.template('Gruntfile.js');
+};
+
+PhpGenerator.prototype.packageJSON = function packageJSON() {
+  this.template('_package.json', 'package.json');
+};
+
+PhpGenerator.prototype.bower = function bower() {
+  this.copy('bowerrc', '.bowerrc');
+  this.copy('_bower.json', 'bower.json');
+};
+
+PhpGenerator.prototype.projectfiles = function projectfiles() {
+  this.copy('editorconfig', '.editorconfig');
+  this.copy('jshintrc', '.jshintrc');
+};
+
+PhpGenerator.prototype.app = function app() {
+  this.mkdir('app');
+  this.mkdir('app/_');
+  this.mkdir('app/_/js');
+  this.mkdir('app/_/css');
+  this.mkdir('app/_/img');
+  this.mkdir('app/_/inc');
+
+  if (this.userOpts.phpServer) {
+    this.copy('router.php', 'router.php');
+    this.copy('router-dist.php', 'router-dist.php');
+  }
+};
+
+PhpGenerator.prototype.h5bp = function h5bp() {
+  this.copy('favicon.ico', 'app/favicon.ico');
+  this.copy('404.html', 'app/404.html');
+  this.copy('robots.txt', 'app/robots.txt');
+  this.copy('htaccess', 'app/.htaccess');
+};
+
+PhpGenerator.prototype.styles = function styles() {
+  this.copy('_/css/_init.scss', 'app/_/css/_init.scss');
+  this.copy('_/css/layout.scss', 'app/_/css/layout.scss');
+  this.copy('_/css/main.scss', 'app/_/css/main.scss');
+};
+
+PhpGenerator.prototype.scripts = function scripts() {
+  this.copy('_/js/functions.js', 'app/_/js/functions.js');
+  this.copy('_/js/validation.js', 'app/_/js/validation.js');
+};
+
+PhpGenerator.prototype.inc = function inc() {
+  this.copy('_/inc/analytics.php', 'app/_/inc/analytics.php');
+  this.copy('_/inc/footer.php', 'app/_/inc/footer.php');
+  this.copy('_/inc/functions.php', 'app/_/inc/functions.php');
+  this.copy('_/inc/header.php', 'app/_/inc/header.php');
+
+  if (this.userOpts.foundation) {
+    this.directory('_/foundation', 'app/_/foundation');
+  }
+}
+
+PhpGenerator.prototype.writeInit = function writeInit() {
+  this.initFile = this.initFile.replace(/SiteName/g, this.userOpts.siteURL);
+  this.initFile = this.initFile.replace(/DevSite/g, this.userOpts.devURL);
+  this.write('app/_/inc/init.php', this.initFile);
+};
+
+PhpGenerator.prototype.writeTail = function writeTail() {
+  var tailScripts = [];
+  tailScripts.push('/_/bower_components/jquery/jquery.js');
+  if (!this.userOpts.bootstrap) 
+    tailScripts.push('/_/bower_components/html5-boilerplate/js/plugins.js');
+  tailScripts.push('/_/js/functions.js');
+  tailScripts.push('/_/js/validation.js');
+
+  this.tailFile = this.appendScripts(this.tailFile, '/_/js/main.js', tailScripts);
+
+  if (this.userOpts.bootstrap) {
+    this.tailFile = this.appendScripts(this.tailFile, '/_/js/lib/bootstrap/plugins.js', [
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-affix.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-alert.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-dropdown.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-tooltip.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-modal.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-transition.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-button.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-popover.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-typeahead.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-carousel.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-scrollspy.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-collapse.js',
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-tab.js'
+    ]);
+  }
+
+  if (this.userOpts.foundation) {
+    this.tailFile = this.appendScripts(this.tailFile, '/_/foundation/javascripts/foundation.js', [
+      '/_/foundation/javascripts/jquery.foundation.alerts.js',
+      '/_/foundation/javascripts/jquery.foundation.buttons.js',
+      '/_/foundation/javascripts/jquery.foundation.accordion.js',
+      '/_/foundation/javascripts/jquery.foundation.mediaQueryToggle.js',
+      '/_/foundation/javascripts/jquery.foundation.navigation.js',
+      '/_/foundation/javascripts/jquery.foundation.tabs.js',
+      '/_/foundation/javascripts/jquery.placeholder.js',
+      '/_/foundation/javascripts/jquery.foundation.forms.js',
+      '/_/foundation/javascripts/jquery.foundation.reveal.js',
+      '/_/foundation/javascripts/jquery.foundation.orbit.js',
+      '/_/foundation/javascripts/jquery.foundation.tooltips.js',
+      '/_/foundation/javascripts/jquery.foundation.topbar.js',
+      '/_/foundation/javascripts/jquery.foundation.joyride.js',
+      '/_/foundation/javascripts/jquery.foundation.clearing.js',
+      '/_/foundation/javascripts/jquery.foundation.magellan.js',
+      '/_/foundation/javascripts/app.js'
+    ]);    
+  }
+
+  this.tailFile = this.tailFile.replace("<body>", "").replace("</body>", "");
+  this.tailFile = this.tailFile.replace(/build:js/g, "build:js(app)");
+  this.write('app/_/inc/tail.php', this.tailFile);
+};
+
+PhpGenerator.prototype.writeHead = function writeTail() {
+  if (this.userOpts.bootstrap) {
+    this.headFile = this.appendStyles(this.headFile, '/_/css/lib/bootstrap.css', [
+        '/_/bower_components/bootstrap/docs/assets/css/bootstrap.css',
+        '/_/bower_components/bootstrap/docs/assets/css/bootstrap-responsive.css'
+    ]);
+  } else {
+    this.headFile = this.appendStyles(this.headFile, '/_/css/lib/html5bp.css', [
+        '/_/bower_components/html5-boilerplate/css/normalize.css',
+        '/_/bower_components/html5-boilerplate/css/main.css'
+    ]);    
+  }
+
+  if (this.userOpts.foundation) {
+    this.headFile = this.appendStyles(this.headFile, '/_/foundation/stylesheets/foundation.css', [
+        '/_/foundation/stylesheets/foundation.css'
+    ]);    
+  }
+
+  this.headFile = this.appendStyles(this.headFile, '/_/css/site-styles.css', [
+    '/_/css/main.css',
+    '/_/css/layout.css'
+  ]);
+
+  this.headFile = this.headFile.replace("<head>", "").replace("</head>", "");
+  this.headFile = this.headFile.replace(/build:css/g, "build:css({.tmp,app})");
+  this.headFile = this.headFile.replace("&lt;", "<").replace("&gt;", ">");
+  this.write('app/_/inc/head.php', this.headFile);
+};
+
+PhpGenerator.prototype.writeIndex = function writeIndex() {
+  var html = "        <h1>" + this.userOpts.siteURL + "</h1>";
+  html += "        Your site is already wired up with:\n        <ul>\n";
+  html += "            <li>Modernizr</li>\n";
+  html += "            <li>Jquery (1.10)</li>\n";
+  html += "            <li>HTML 5 Boilerplate</li>\n";
+  if (this.userOpts.bootstrap) 
+    html += "            <li>Twitter Bootstrap (2.3.2)</li>\n";
+  if (this.userOpts.foundation)
+    html += "            <li>Foundation (v3)</li>\n"; 
+  html += "        </ul>\n";
+
+  html += "        <p>Don't forget to setup your site-wide variables for DEV and LIVE in /_/inc/init.php</p>";
+  this.indexFile = this.indexFile.replace('<div id="PageBody">','<div id="PageBody">\n' + html);
+  this.write("app/index.php", this.indexFile);
+}
+
+
+

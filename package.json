@@ -1,0 +1,45 @@
+{
+  "name": "generator-php",
+  "version": "0.1.0",
+  "description": "A php web project generator for Yeoman",
+  "keywords": [
+    "yeoman-generator",
+    "php",
+    "web",
+    "html",
+    "generator"
+  ],
+  "homepage": "https://github.com/Bradleycorn/generator-php",
+  "bugs": "https://github.com/Bradleycorn/generator-php/issues",
+  "author": {
+    "name": "Brad Ball",
+    "email": "development@bradball.net",
+    "url": "https://github.com/Bradleycorn"
+  },
+  "main": "app/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Bradleycorn/generator-php.git"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "yeoman-generator": "~0.13.0"
+  },
+  "devDependencies": {
+    "mocha": "~1.12.0"
+  },
+  "peerDependencies": {
+    "yo": ">=1.0.0-rc.1"
+  },
+  "engines": {
+    "node": ">=0.8.0",
+    "npm": ">=1.2.10"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ]
+}

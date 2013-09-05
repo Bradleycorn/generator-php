@@ -1,0 +1,15 @@
+/* COLORS */
+$CopyColor: #222222;
+$HighlightColor: #C1CB38;
+$LinkColor: #0000FF;
+
+/* FONT STACKS */
+$SansStack: Arial, sans-serif;
+$SansAltStack: 'Helvetica Neue', Helvetica, sans-serif;
+$SerifStack: Georgia, Serif;
+
+@mixin BodyCopy {
+	color: $CopyColor;
+	font-family: $SansStack;
+	font-weight: normal;
+}

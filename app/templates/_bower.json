@@ -1,0 +1,11 @@
+{
+  "name": "<%= _.slugify(appname) %>",
+  "version": "0.1.0",
+  "dependencies": {
+  	"html5-boilerplate": "~4.2.0",<% if (userOpts.bootstrap) { %>
+    "bootstrap": "~2.3.2", <% } %>
+    "modernizr": "~2.6.2",
+    "jquery": "~1.10.2"
+  },
+  "devDependencies": {}
+}
