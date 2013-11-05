@@ -1,3 +1,6 @@
+/* global _gaq */
+
+/* exported TrackEvent */
 function TrackEvent(category, action, label, url) {
 	try {
 		_gaq.push(['_trackEvent', category, action, label]);

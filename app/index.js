@@ -11,6 +11,8 @@ var PhpGenerator = module.exports = function PhpGenerator(args, options, config)
   this.paths.dev = "app";
   this.paths.dist = "dist";
 
+  this.isIIS = (options['iis']) ? true : false;
+
   this.on('end', function () {
     this.installDependencies({ skipInstall: options['skip-install'] });
   });
@@ -56,10 +58,9 @@ PhpGenerator.prototype.askFor = function askFor() {
     default: false
   },  
   {
-    type: 'confirm',
     name: 'bootstrap',
-    message: 'Include Twitter Bootstrap (v2.3.2)?',
-    default: true
+    message: 'Which version of Twitter Bootstrap shall I include (none, 2.3.2, 3.0.0, etc)?',
+    default: '3.0.0'
   },
   {
     type: 'confirm',
@@ -79,7 +80,11 @@ PhpGenerator.prototype.askFor = function askFor() {
     this.userOpts.devURL = props.devURL;
     this.userOpts.devPort = props.devPort;
     this.userOpts.phpServer = props.phpServer;
-    this.userOpts.bootstrap = props.bootstrap;
+    props.bootstrap = props.bootstrap.toLowerCase().trim();
+    if (props.bootstrap.search(/^\d{1,2}(\.\d{1,2})?(\.\d{1,2})?$/) == 0) 
+      this.userOpts.bootstrap = props.bootstrap;
+    else
+      this.userOpts.bootstrap = 'none';
     this.userOpts.foundation = props.foundation;
 
     //Default file versioning to "off" for all types
@@ -153,7 +158,10 @@ PhpGenerator.prototype.h5bp = function h5bp() {
   this.copy('favicon.ico', 'app/favicon.ico');
   this.copy('404.html', 'app/404.html');
   this.copy('robots.txt', 'app/robots.txt');
-  this.copy('htaccess', 'app/.htaccess');
+  if (this.isIIS)
+    this.template('web.config', 'app/web.config');
+  else
+    this.copy('htaccess', 'app/.htaccess');
 };
 
 PhpGenerator.prototype.styles = function styles() {
@@ -187,28 +195,21 @@ PhpGenerator.prototype.writeInit = function writeInit() {
 PhpGenerator.prototype.writeTail = function writeTail() {
   var tailScripts = [];
   tailScripts.push('/_/bower_components/jquery/jquery.js');
-  if (!this.userOpts.bootstrap) 
+  if (this.userOpts.bootstrap == 'none') 
     tailScripts.push('/_/bower_components/html5-boilerplate/js/plugins.js');
   tailScripts.push('/_/js/functions.js');
   tailScripts.push('/_/js/validation.js');
 
   this.tailFile = this.appendScripts(this.tailFile, '/_/js/main.js', tailScripts);
 
-  if (this.userOpts.bootstrap) {
-    this.tailFile = this.appendScripts(this.tailFile, '/_/js/lib/bootstrap/plugins.js', [
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-affix.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-alert.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-dropdown.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-tooltip.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-modal.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-transition.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-button.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-popover.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-typeahead.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-carousel.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-scrollspy.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-collapse.js',
-      '/_/bower_components/bootstrap/docs/assets/js/bootstrap-tab.js'
+  if (this.userOpts.bootstrap == '2.3.2') {
+    this.tailFile = this.appendScripts(this.tailFile, '/_/js/bootstrap.js', [
+      '/_/bower_components/bootstrap/docs/assets/js/bootstrap.js',
+    ]);
+
+  } else if (this.userOpts.bootstrap != 'none') {
+    this.tailFile = this.appendScripts(this.tailFile, '/_/js/bootstrap.js', [
+      '/_/bower_components/bootstrap/dist/js/bootstrap.js',
     ]);
   }
 
@@ -238,12 +239,17 @@ PhpGenerator.prototype.writeTail = function writeTail() {
   this.write('app/_/inc/tail.php', this.tailFile);
 };
 
-PhpGenerator.prototype.writeHead = function writeTail() {
-  if (this.userOpts.bootstrap) {
-    this.headFile = this.appendStyles(this.headFile, '/_/css/lib/bootstrap.css', [
+PhpGenerator.prototype.writeHead = function writeHead() {
+  if (this.userOpts.bootstrap == '2.3.2') {
+    this.headFile = this.appendStyles(this.headFile, '/_/css/bootstrap.css', [
         '/_/bower_components/bootstrap/docs/assets/css/bootstrap.css',
         '/_/bower_components/bootstrap/docs/assets/css/bootstrap-responsive.css'
     ]);
+  } else if (this.userOpts.bootstrap != 'none') {
+    this.headFile = this.appendStyles(this.headFile, '/_/css/bootstrap.css', [
+        '/_/bower_components/bootstrap/dist/css/bootstrap.css',
+        '/_/bower_components/bootstrap/dist/css/bootstrap-theme.css'
+    ]);    
   } else {
     this.headFile = this.appendStyles(this.headFile, '/_/css/lib/html5bp.css', [
         '/_/bower_components/html5-boilerplate/css/normalize.css',
@@ -274,8 +280,8 @@ PhpGenerator.prototype.writeIndex = function writeIndex() {
   html += "            <li>Modernizr</li>\n";
   html += "            <li>Jquery (1.10)</li>\n";
   html += "            <li>HTML 5 Boilerplate</li>\n";
-  if (this.userOpts.bootstrap) 
-    html += "            <li>Twitter Bootstrap (2.3.2)</li>\n";
+  if (this.userOpts.bootstrap != 'none') 
+    html += "            <li>Twitter Bootstrap (v " + this.userOpts.bootstrap + ")</li>\n";
   if (this.userOpts.foundation)
     html += "            <li>Foundation (v3)</li>\n"; 
   html += "        </ul>\n";

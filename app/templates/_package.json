@@ -20,7 +20,9 @@
     "grunt-svgmin": "~0.1.0",
     "grunt-concurrent": "~0.1.0",
     "matchdep": "~0.1.1",
-    "grunt-php": "~0.1.1"
+    "grunt-php": "~0.1.1",
+    "grunt-lint-inline": "~0.2.0",
+    "grunt-phplint": "~0.0.5"
   },
   "engines": {
     "node": ">=0.8.0"
