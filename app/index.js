@@ -34,7 +34,7 @@ PhpGenerator.prototype.askFor = function askFor() {
   console.log(this.yeoman);
   console.log('I\'ll be scaffolding out a php website for you.');
   console.log('Out of the box you\'re going to get:');
-  console.log('- HTML5 Boilerplate'); 
+  console.log('- HTML5 Boilerplate');
   console.log('- jQuery (v1.10)');
   console.log('- Modernizr (v2.6.2)');
 
@@ -56,7 +56,7 @@ PhpGenerator.prototype.askFor = function askFor() {
     name: 'phpServer',
     message: 'Use PHP\'s built-in web server for dev testing?',
     default: false
-  },  
+  },
   {
     name: 'bootstrap',
     message: 'Which version of Twitter Bootstrap shall I include (none, 2.3.2, 3.0.0, etc)?',
@@ -81,7 +81,7 @@ PhpGenerator.prototype.askFor = function askFor() {
     this.userOpts.devPort = props.devPort;
     this.userOpts.phpServer = props.phpServer;
     props.bootstrap = props.bootstrap.toLowerCase().trim();
-    if (props.bootstrap.search(/^\d{1,2}(\.\d{1,2})?(\.\d{1,2})?$/) == 0) 
+    if (props.bootstrap.search(/^\d{1,2}(\.\d{1,2})?(\.\d{1,2})?$/) == 0)
       this.userOpts.bootstrap = props.bootstrap;
     else
       this.userOpts.bootstrap = 'none';
@@ -91,14 +91,14 @@ PhpGenerator.prototype.askFor = function askFor() {
     this.userOpts.revImages = false;
     this.userOpts.revScripts = false;
     this.userOpts.revStyles = false;
-    
+
     props.versioning = props.versioning.toLowerCase().trim();
- 
+
     if (props.versioning == 'all') {
       //Enable versioning on all file types
       this.userOpts.revImages = true;
       this.userOpts.revScripts = true;
-      this.userOpts.revStyles = true;      
+      this.userOpts.revStyles = true;
     } else {
       //Loop through user input and enable versioning on appropriate file types
       var fileType, i;
@@ -114,7 +114,7 @@ PhpGenerator.prototype.askFor = function askFor() {
             break;
           case 'img':
             this.userOpts.revImages = true;
-            break; 
+            break;
         }
       }
     }
@@ -138,6 +138,7 @@ PhpGenerator.prototype.bower = function bower() {
 PhpGenerator.prototype.projectfiles = function projectfiles() {
   this.copy('editorconfig', '.editorconfig');
   this.copy('jshintrc', '.jshintrc');
+  this.copy('gitignore', '.gitignore');
 };
 
 PhpGenerator.prototype.app = function app() {
@@ -195,7 +196,7 @@ PhpGenerator.prototype.writeInit = function writeInit() {
 PhpGenerator.prototype.writeTail = function writeTail() {
   var tailScripts = [];
   tailScripts.push('/_/bower_components/jquery/jquery.js');
-  if (this.userOpts.bootstrap == 'none') 
+  if (this.userOpts.bootstrap == 'none')
     tailScripts.push('/_/bower_components/html5-boilerplate/js/plugins.js');
   tailScripts.push('/_/js/functions.js');
   tailScripts.push('/_/js/validation.js');
@@ -231,7 +232,7 @@ PhpGenerator.prototype.writeTail = function writeTail() {
       '/_/foundation/javascripts/jquery.foundation.clearing.js',
       '/_/foundation/javascripts/jquery.foundation.magellan.js',
       '/_/foundation/javascripts/app.js'
-    ]);    
+    ]);
   }
 
   this.tailFile = this.tailFile.replace("<body>", "").replace("</body>", "");
@@ -249,18 +250,18 @@ PhpGenerator.prototype.writeHead = function writeHead() {
     this.headFile = this.appendStyles(this.headFile, '/_/css/bootstrap.css', [
         '/_/bower_components/bootstrap/dist/css/bootstrap.css',
         '/_/bower_components/bootstrap/dist/css/bootstrap-theme.css'
-    ]);    
+    ]);
   } else {
     this.headFile = this.appendStyles(this.headFile, '/_/css/lib/html5bp.css', [
         '/_/bower_components/html5-boilerplate/css/normalize.css',
         '/_/bower_components/html5-boilerplate/css/main.css'
-    ]);    
+    ]);
   }
 
   if (this.userOpts.foundation) {
     this.headFile = this.appendStyles(this.headFile, '/_/foundation/stylesheets/foundation.css', [
         '/_/foundation/stylesheets/foundation.css'
-    ]);    
+    ]);
   }
 
   this.headFile = this.appendStyles(this.headFile, '/_/css/site-styles.css', [
@@ -280,10 +281,10 @@ PhpGenerator.prototype.writeIndex = function writeIndex() {
   html += "            <li>Modernizr</li>\n";
   html += "            <li>Jquery (1.10)</li>\n";
   html += "            <li>HTML 5 Boilerplate</li>\n";
-  if (this.userOpts.bootstrap != 'none') 
+  if (this.userOpts.bootstrap != 'none')
     html += "            <li>Twitter Bootstrap (v " + this.userOpts.bootstrap + ")</li>\n";
   if (this.userOpts.foundation)
-    html += "            <li>Foundation (v3)</li>\n"; 
+    html += "            <li>Foundation (v3)</li>\n";
   html += "        </ul>\n";
 
   html += "        <p>Don't forget to setup your site-wide variables for DEV and LIVE in /_/inc/init.php</p>";
