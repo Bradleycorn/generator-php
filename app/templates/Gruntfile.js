@@ -17,8 +17,8 @@ module.exports = function (grunt) {
     //  put here for ease of maintenance. Update the value here, and all other places are updated
     //  automagically.
     var yeomanConfig = {
-        app: 'app',
-        dist: 'dist',
+        app: '<%= paths.dev %>',
+        dist: '<%= paths.dist %>',
         siteURL: '<%= userOpts.siteURL %>',
         devURL: '<%= userOpts.devURL %>',
         devPort: <%= userOpts.devPort %>

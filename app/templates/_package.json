@@ -1,5 +1,5 @@
 {
-  "name": "<%= _.slugify(appname) %>",
+  "name": "<%= _.slugify(userOpts.siteURL) %>",
   "version": "0.1.0",
   "dependencies": {},
   "devDependencies": {

@@ -72,6 +72,16 @@ PhpGenerator.prototype.askFor = function askFor() {
     name: 'versioning',
     message: 'Which files should be versioned to force cache expiration (none, all, css, js, img)?',
     default: 'none'
+  },
+  {
+    name: 'appdir',
+    message: 'What name should I give the application directory where your development files are placed?',
+    default: 'app'
+  },
+  {
+    name: 'distdir',
+    message: 'What name should I give the distribution directory where compiled output files are placed?',
+    default: 'dist'
   }];
 
   this.prompt(prompts, function (props) {
@@ -118,6 +128,8 @@ PhpGenerator.prototype.askFor = function askFor() {
         }
       }
     }
+    this.paths.dev = props.appdir;
+    this.paths.dist = props.distdir;
     cb();
   }.bind(this));
 };
@@ -131,66 +143,66 @@ PhpGenerator.prototype.packageJSON = function packageJSON() {
 };
 
 PhpGenerator.prototype.bower = function bower() {
-  this.copy('bowerrc', '.bowerrc');
+  this.template('bowerrc', '.bowerrc');
   this.copy('_bower.json', 'bower.json');
 };
 
 PhpGenerator.prototype.projectfiles = function projectfiles() {
   this.copy('editorconfig', '.editorconfig');
   this.copy('jshintrc', '.jshintrc');
-  this.copy('gitignore', '.gitignore');
+  this.template('gitignore', '.gitignore');
 };
 
 PhpGenerator.prototype.app = function app() {
-  this.mkdir('app');
-  this.mkdir('app/_');
-  this.mkdir('app/_/js');
-  this.mkdir('app/_/css');
-  this.mkdir('app/_/img');
-  this.mkdir('app/_/inc');
+  this.mkdir(this.paths.dev);
+  this.mkdir(this.paths.dev + '/_');
+  this.mkdir(this.paths.dev + '/_/js');
+  this.mkdir(this.paths.dev + '/_/css');
+  this.mkdir(this.paths.dev + '/_/img');
+  this.mkdir(this.paths.dev + '/_/inc');
 
   if (this.userOpts.phpServer) {
-    this.copy('router.php', 'router.php');
+    this.template('router.php', 'router.php');
     this.copy('router-dist.php', 'router-dist.php');
   }
 };
 
 PhpGenerator.prototype.h5bp = function h5bp() {
-  this.copy('favicon.ico', 'app/favicon.ico');
-  this.copy('404.html', 'app/404.html');
-  this.copy('robots.txt', 'app/robots.txt');
+  this.copy('favicon.ico', this.paths.dev + '/favicon.ico');
+  this.copy('404.html', this.paths.dev + '/404.html');
+  this.copy('robots.txt', this.paths.dev + '/robots.txt');
   if (this.isIIS)
-    this.template('web.config', 'app/web.config');
+    this.template('web.config', this.paths.dev + '/web.config');
   else
-    this.copy('htaccess', 'app/.htaccess');
+    this.copy('htaccess', this.paths.dev + '/.htaccess');
 };
 
 PhpGenerator.prototype.styles = function styles() {
-  this.copy('_/css/_init.scss', 'app/_/css/_init.scss');
-  this.copy('_/css/layout.scss', 'app/_/css/layout.scss');
-  this.copy('_/css/main.scss', 'app/_/css/main.scss');
+  this.copy('_/css/_init.scss', this.paths.dev + '/_/css/_init.scss');
+  this.copy('_/css/layout.scss', this.paths.dev + '/_/css/layout.scss');
+  this.copy('_/css/main.scss', this.paths.dev + '/_/css/main.scss');
 };
 
 PhpGenerator.prototype.scripts = function scripts() {
-  this.copy('_/js/functions.js', 'app/_/js/functions.js');
-  this.copy('_/js/validation.js', 'app/_/js/validation.js');
+  this.copy('_/js/functions.js', this.paths.dev + '/_/js/functions.js');
+  this.copy('_/js/validation.js', this.paths.dev + '/_/js/validation.js');
 };
 
 PhpGenerator.prototype.inc = function inc() {
-  this.copy('_/inc/analytics.php', 'app/_/inc/analytics.php');
-  this.copy('_/inc/footer.php', 'app/_/inc/footer.php');
-  this.copy('_/inc/functions.php', 'app/_/inc/functions.php');
-  this.copy('_/inc/header.php', 'app/_/inc/header.php');
+  this.copy('_/inc/analytics.php', this.paths.dev + '/_/inc/analytics.php');
+  this.copy('_/inc/footer.php', this.paths.dev + '/_/inc/footer.php');
+  this.copy('_/inc/functions.php', this.paths.dev + '/_/inc/functions.php');
+  this.copy('_/inc/header.php', this.paths.dev + '/_/inc/header.php');
 
   if (this.userOpts.foundation) {
-    this.directory('_/foundation', 'app/_/foundation');
+    this.directory('_/foundation', this.paths.dev + '/_/foundation');
   }
 }
 
 PhpGenerator.prototype.writeInit = function writeInit() {
   this.initFile = this.initFile.replace(/SiteName/g, this.userOpts.siteURL);
   this.initFile = this.initFile.replace(/DevSite/g, this.userOpts.devURL);
-  this.write('app/_/inc/init.php', this.initFile);
+  this.write(this.paths.dev + '/_/inc/init.php', this.initFile);
 };
 
 PhpGenerator.prototype.writeTail = function writeTail() {
@@ -236,8 +248,8 @@ PhpGenerator.prototype.writeTail = function writeTail() {
   }
 
   this.tailFile = this.tailFile.replace("<body>", "").replace("</body>", "");
-  this.tailFile = this.tailFile.replace(/build:js/g, "build:js(app)");
-  this.write('app/_/inc/tail.php', this.tailFile);
+  this.tailFile = this.tailFile.replace(/build:js/g, "build:js(" + this.paths.dev + ")");
+  this.write(this.paths.dev + '/_/inc/tail.php', this.tailFile);
 };
 
 PhpGenerator.prototype.writeHead = function writeHead() {
@@ -270,9 +282,9 @@ PhpGenerator.prototype.writeHead = function writeHead() {
   ]);
 
   this.headFile = this.headFile.replace("<head>", "").replace("</head>", "");
-  this.headFile = this.headFile.replace(/build:css/g, "build:css({.tmp,app})");
+  this.headFile = this.headFile.replace(/build:css/g, "build:css({.tmp," + this.paths.dev + "})");
   this.headFile = this.headFile.replace("&lt;", "<").replace("&gt;", ">");
-  this.write('app/_/inc/head.php', this.headFile);
+  this.write(this.paths.dev + '/_/inc/head.php', this.headFile);
 };
 
 PhpGenerator.prototype.writeIndex = function writeIndex() {
@@ -289,7 +301,7 @@ PhpGenerator.prototype.writeIndex = function writeIndex() {
 
   html += "        <p>Don't forget to setup your site-wide variables for DEV and LIVE in /_/inc/init.php</p>";
   this.indexFile = this.indexFile.replace('<div id="PageBody">','<div id="PageBody">\n' + html);
-  this.write("app/index.php", this.indexFile);
+  this.write(this.paths.dev + "/index.php", this.indexFile);
 }
 
 

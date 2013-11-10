@@ -12,7 +12,7 @@ if (preg_match('/\.(?:css)$/', $_SERVER["REQUEST_URI"])) {
     //$urlPath = str_ireplace("/", "\\", $_SERVER["REQUEST_URI"]);
     $urlPath = $_SERVER["REQUEST_URI"];
 
-    $filePath = str_ireplace("app", ".tmp", $serverPath . $urlPath);
+    $filePath = str_ireplace("<%= paths.dev %>", ".tmp", $serverPath . $urlPath);
 	header('Content-type: text/css');
     echo(file_get_contents($filePath));
 } else {
