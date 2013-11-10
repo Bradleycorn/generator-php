@@ -1,5 +1,5 @@
 .sass-cache
 .tmp
-dist
+<%= paths.dist %>
 node_modules
 <%= paths.dev %>/_/bower_components
