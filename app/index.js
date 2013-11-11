@@ -222,7 +222,7 @@ PhpGenerator.prototype.writeTail = function writeTail() {
 
   } else if (this.userOpts.bootstrap != 'none') {
     this.tailFile = this.appendScripts(this.tailFile, '/_/js/bootstrap.js', [
-      '/_/bower_components/bootstrap/dist/js/bootstrap.js',
+      '/_/bower_components/bootstrap/dist/js/bootstrap.js'
     ]);
   }
 
@@ -284,6 +284,10 @@ PhpGenerator.prototype.writeHead = function writeHead() {
   this.headFile = this.headFile.replace("<head>", "").replace("</head>", "");
   this.headFile = this.headFile.replace(/build:css/g, "build:css({.tmp," + this.paths.dev + "})");
   this.headFile = this.headFile.replace("&lt;", "<").replace("&gt;", ">");
+
+  if (this.userOpts.bootstrap != 'none' && this.userOpts.bootstrap != '2.3.2') {
+    this.headFile += "\n<!-- build:js /_/js/respond.js -->\n<!--[if lt IE 9]>\n<script src=\"/_/bower_components/respond/respond.min.js\"></script>\n<![endif]-->\n<!-- endbuild -->\n";
+  }
   this.write(this.paths.dev + '/_/inc/head.php', this.headFile);
 };
 

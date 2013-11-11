@@ -356,16 +356,16 @@ module.exports = function (grunt) {
                     //Copy the bootcamp icon font files to the correct dist folder.
                     expand: true,
                     dot: true,
-                    cwd: '<%= yeoman.app %>',
-                    dest: '<%= yeoman.dist %>/_/fonts',
+                    cwd: '<%%= yeoman.app %>',
+                    dest: '<%%= yeoman.dist %>/_/fonts',
                     flatten: true,
                     src: '_/bower_components/bootstrap/dist/fonts/*'
                 }<% } else if (userOpts.bootstrap == '2.3.2') { %>,{
                     //Copy the bootcamp icon image sprites to the correct dist folder.
                     expand: true,
                     dot: true,
-                    cwd: '<%= yeoman.app %>',
-                    dest: '<%= yeoman.dist %>/_/img',
+                    cwd: '<%%= yeoman.app %>',
+                    dest: '<%%= yeoman.dist %>/_/img',
                     flatten: true,
                     src: '_/bower_components/bootstrap/docs/assets/img/glyphicons*.png'
                 }<% } %>]
