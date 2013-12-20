@@ -39,13 +39,40 @@ module.exports = function (grunt) {
         //  The watch opertation will watch a set of files
         //  and run other operations when those files are
         //  edited or otherwised changed.
-        watch: {
+        watch: {<% if (userOpts.css == 'compass') { %>
             compass: {
                 files: ['<%%= yeoman.app %>/_/css/**/*.{scss,sass}'], //Watch these files, and...
                 tasks: ['compass:server'] //run this operation when the files change.
+            },<% } else if (userOpts.css == 'sass') { %> 
+            sass: {
+                files: ['<%%= yeoman.app %>/_/css/**/*.{scss,sass}'], //Watch these files, and...
+                tasks: ['sass:server'] //run this operation when the files change.
+            },<% } %>
+            livereload: {
+                options: {livereload: 1025},
+                files: [<% if (userOpts.css == 'compass' || userOpts.css == 'sass') { %>
+                    '.tmp/_/css/**/*.css',<% } else { %>
+                    '<%%= yeoman.app %>/_/css/**/*.css',<% } %>
+                    '<%%= yeoman.app %>/_/js/**/*',
+                    '<%%= yeoman.app %>/_/img/**/*',
+                    '<%%= yeoman.app %>/**/*.php'
+                ]
             }
         },
 
+        // PROCESSHTML
+        //  The processhtml operation will process the defined files
+        //  looking for "build" comment blocks and processing them accordingly.
+        //  In our case, we want to process the dist version of the tail.php
+        //  and remove the script tags that were put in there for livereload
+        //  purposes during development.
+        processhtml: {
+            dist: {
+                files: {
+                    '<%%= yeoman.dist %>/_/inc/tail.php': ['<%%= yeoman.dist %>/_/inc/tail.php']
+                }
+            }
+        },
 
 <% if(userOpts.phpServer) { %>
         // PHP
@@ -147,7 +174,7 @@ module.exports = function (grunt) {
             all: ['<%%= yeoman.app %>/**/*.php']
         },
 
-
+<% if (userOpts.css == 'compass') { %>
         // COMPASS
         //  The compass operation runs Compass (Sass compilation)
         //  on our Stylesheets to produce finalized css.
@@ -176,8 +203,45 @@ module.exports = function (grunt) {
                 }
             }
         },
+<% } %>
 
-
+<% if (userOpts.css == 'sass') { %>
+        // SASS
+        //  The sass operation runs the sass preprocessor
+        //  on our Stylesheets to produce finalized css.
+        sass: {
+            server: {
+                options: {
+                    sourcemap: true,
+                    debugInfo: true,
+                    lineNumbers: true,
+                    style: 'expanded'
+                },
+                files : [{
+                    expand: true,
+                    cwd: '<%%= yeoman.app %>/_/css',
+                    src: '**/*.scss',
+                    dest: '.tmp/_/css',
+                    ext: '.css'
+                }]
+            },
+            dist: {
+                options: {
+                    sourcemap: false,
+                    debugInfo: false,
+                    lineNumbers: false,
+                    style: 'compact'
+                },
+                files : [{
+                    expand: true,
+                    cwd: '<%%= yeoman.app %>/_/css',
+                    src: '**/*.scss',
+                    dest: '.tmp/_/css',
+                    ext: '.css'
+                }]
+            }
+        },
+<% } %>
 
         // REV
         //  The rev operation will apply revision numbers to filenames (filename.ext will become filename.revision_no.ext)
@@ -378,8 +442,9 @@ module.exports = function (grunt) {
         //  to be run at the same time, to speed up the build process. Simply list
         //  the operations to be run concurrently, and it will be done.
         concurrent: {
-            dist: [
-                'compass',
+            dist: [<% if (userOpts.css == 'compass') { %>
+                'compass',<% } else if (userOpts.css == 'sass') { %>
+                'sass:dist',<% } %>
                 'imagemin',
                 'svgmin',
                 'htmlmin'
@@ -418,9 +483,11 @@ module.exports = function (grunt) {
         }
 
         grunt.task.run([
-            'clean:server',
-            'compass',<% if (userOpts.phpServer) { %>
-            'php:server' <% } else { %> 'open:server'<% } %>,
+            'clean:server',<% if (userOpts.css == 'compass') { %>
+            'compass',<% } else if (userOpts.css == 'sass') { %>
+            'sass:server',<% } if (userOpts.phpServer) { %>
+            'php:server',<% } else { %>
+            'open:server',<% } %>
             'watch'
         ]);
     });
@@ -438,7 +505,8 @@ module.exports = function (grunt) {
         'uglify',
         'copy:dist',
         'rev',
-        'usemin'
+        'usemin',
+        'processhtml:dist'
     ]);
 
 

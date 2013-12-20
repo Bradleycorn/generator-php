@@ -58,9 +58,14 @@ PhpGenerator.prototype.askFor = function askFor() {
     default: false
   },
   {
+    name: 'css',
+    message: 'Which CSS preprocessor shall I use (none, sass, compass)?',
+    default: 'sass'
+  },
+  {
     name: 'bootstrap',
     message: 'Which version of Twitter Bootstrap shall I include (none, 2.3.2, 3.0.0, etc)?',
-    default: '3.0.0'
+    default: '3.0.3'
   },
   {
     type: 'confirm',
@@ -90,6 +95,7 @@ PhpGenerator.prototype.askFor = function askFor() {
     this.userOpts.devURL = props.devURL;
     this.userOpts.devPort = props.devPort;
     this.userOpts.phpServer = props.phpServer;
+    this.userOpts.css = props.css.toLowerCase();
     props.bootstrap = props.bootstrap.toLowerCase().trim();
     if (props.bootstrap.search(/^\d{1,2}(\.\d{1,2})?(\.\d{1,2})?$/) == 0)
       this.userOpts.bootstrap = props.bootstrap;
@@ -178,9 +184,14 @@ PhpGenerator.prototype.h5bp = function h5bp() {
 };
 
 PhpGenerator.prototype.styles = function styles() {
-  this.copy('_/css/_init.scss', this.paths.dev + '/_/css/_init.scss');
-  this.copy('_/css/layout.scss', this.paths.dev + '/_/css/layout.scss');
-  this.copy('_/css/main.scss', this.paths.dev + '/_/css/main.scss');
+  if (this.userOpts.css == 'compass' || this.userOpts.css == 'sass') {
+    this.copy('_/css/_init.scss', this.paths.dev + '/_/css/_init.scss');
+    this.copy('_/css/layout.scss', this.paths.dev + '/_/css/layout.scss');
+    this.copy('_/css/main.scss', this.paths.dev + '/_/css/main.scss');
+  } else {
+    this.copy('_/css/layout.css', this.paths.dev + '/_/css/layout.css');
+    this.copy('_/css/main.css', this.paths.dev + '/_/css/main.css');
+  }
 };
 
 PhpGenerator.prototype.scripts = function scripts() {
@@ -249,6 +260,7 @@ PhpGenerator.prototype.writeTail = function writeTail() {
 
   this.tailFile = this.tailFile.replace("<body>", "").replace("</body>", "");
   this.tailFile = this.tailFile.replace(/build:js/g, "build:js(" + this.paths.dev + ")");
+  this.tailFile = this.tailFile.replace("[devurl]", this.userOpts.devURL);
   this.write(this.paths.dev + '/_/inc/tail.php', this.tailFile);
 };
 
@@ -297,6 +309,10 @@ PhpGenerator.prototype.writeIndex = function writeIndex() {
   html += "            <li>Modernizr</li>\n";
   html += "            <li>Jquery (1.10)</li>\n";
   html += "            <li>HTML 5 Boilerplate</li>\n";
+  if (this.userOpts.css == 'sass') 
+    html += "            <li>Sass Stylesheets</li>\n";
+  else if (this.userOpts.css == 'compass')
+    html += "            <li>Sass Stylesheets with Compass</li>\n";
   if (this.userOpts.bootstrap != 'none')
     html += "            <li>Twitter Bootstrap (v " + this.userOpts.bootstrap + ")</li>\n";
   if (this.userOpts.foundation)
@@ -307,6 +323,3 @@ PhpGenerator.prototype.writeIndex = function writeIndex() {
   this.indexFile = this.indexFile.replace('<div id="PageBody">','<div id="PageBody">\n' + html);
   this.write(this.paths.dev + "/index.php", this.indexFile);
 }
-
-
-

@@ -1,6 +1,7 @@
 <?php
 // router.php
 
+<% if (userOpts.css != 'none') { %>
 //Files in the foundation folder (if present) should be ignored by all rules below.
 if (preg_match('/_\/(bower_components|foundation).*?\.css/', $_SERVER["REQUEST_URI"])) {
 	return false;
@@ -18,4 +19,9 @@ if (preg_match('/\.(?:css)$/', $_SERVER["REQUEST_URI"])) {
 } else {
 	return false;
 }
+<% } else { %>
+return false; 
+<% } %>
+
+
 ?>
