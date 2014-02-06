@@ -37,25 +37,16 @@ PhpGenerator.prototype.askFor = function askFor() {
   console.log('- HTML5 Boilerplate');
   console.log('- jQuery (v1.10)');
   console.log('- Modernizr (v2.6.2)');
+  if (this.isIIS)
+ 	 console.log('I see you are running windows. I\'ll take that into account');
 
   var prompts = [{
     name: 'siteURL',
-    message: 'What\'s the production URL for this site?',
+    message: 'What\'s the URL for this site?',
   },
   {
     name: 'devURL',
     message: 'and the dev URL?',
-  },
-  {
-    name: 'devPort',
-    message: 'What port should I use for the dev URL?',
-    default: 80
-  },
-  {
-    type: 'confirm',
-    name: 'phpServer',
-    message: 'Use PHP\'s built-in web server for dev testing?',
-    default: false
   },
   {
     name: 'css',
@@ -68,40 +59,24 @@ PhpGenerator.prototype.askFor = function askFor() {
     default: '3.0.3'
   },
   {
-    type: 'confirm',
-    name: 'foundation',
-    message: 'Include Foundation Framework (v3)?',
-    default: false
-  },
-  {
     name: 'versioning',
     message: 'Which files should be versioned to force cache expiration (none, all, css, js, img)?',
     default: 'none'
-  },
-  {
-    name: 'appdir',
-    message: 'What name should I give the application directory where your development files are placed?',
-    default: 'app'
-  },
-  {
-    name: 'distdir',
-    message: 'What name should I give the distribution directory where compiled output files are placed?',
-    default: 'dist'
   }];
 
   this.prompt(prompts, function (props) {
     this.userOpts = {};
     this.userOpts.siteURL = props.siteURL;
     this.userOpts.devURL = props.devURL;
-    this.userOpts.devPort = props.devPort;
-    this.userOpts.phpServer = props.phpServer;
+    this.userOpts.devPort = 80;
+    this.userOpts.phpServer = false;
     this.userOpts.css = props.css.toLowerCase();
     props.bootstrap = props.bootstrap.toLowerCase().trim();
     if (props.bootstrap.search(/^\d{1,2}(\.\d{1,2})?(\.\d{1,2})?$/) == 0)
       this.userOpts.bootstrap = props.bootstrap;
     else
       this.userOpts.bootstrap = 'none';
-    this.userOpts.foundation = props.foundation;
+    this.userOpts.foundation = false;
 
     //Default file versioning to "off" for all types
     this.userOpts.revImages = false;
@@ -134,8 +109,8 @@ PhpGenerator.prototype.askFor = function askFor() {
         }
       }
     }
-    this.paths.dev = props.appdir;
-    this.paths.dist = props.distdir;
+    this.paths.dev = 'dev';
+    this.paths.dist = 'www';
     cb();
   }.bind(this));
 };
@@ -309,7 +284,7 @@ PhpGenerator.prototype.writeIndex = function writeIndex() {
   html += "            <li>Modernizr</li>\n";
   html += "            <li>Jquery (1.10)</li>\n";
   html += "            <li>HTML 5 Boilerplate</li>\n";
-  if (this.userOpts.css == 'sass') 
+  if (this.userOpts.css == 'sass')
     html += "            <li>Sass Stylesheets</li>\n";
   else if (this.userOpts.css == 'compass')
     html += "            <li>Sass Stylesheets with Compass</li>\n";
