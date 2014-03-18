@@ -2,5 +2,5 @@
 </body>
 
 <!-- build:remove:dist -->
-<script src="//[devurl]:1025/livereload.js"></script>
+<script src="//[localurl]:35729/livereload.js"></script>
 <!-- /build -->

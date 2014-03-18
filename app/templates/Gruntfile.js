@@ -21,6 +21,7 @@ module.exports = function (grunt) {
         dist: '<%= paths.dist %>',
         siteURL: '<%= userOpts.siteURL %>',
         devURL: '<%= userOpts.devURL %>',
+        localURL: '<%= userOpts.localURL %>',
         devPort: <%= userOpts.devPort %>
     };
 
@@ -39,17 +40,17 @@ module.exports = function (grunt) {
         //  The watch opertation will watch a set of files
         //  and run other operations when those files are
         //  edited or otherwised changed.
-        watch: {<% if (userOpts.css == 'compass') { %>
+        watch: {<% if (userOpts.css == 'compass') {%>
             compass: {
                 files: ['<%%= yeoman.app %>/_/css/**/*.{scss,sass}'], //Watch these files, and...
                 tasks: ['compass:server'] //run this operation when the files change.
-            },<% } else if (userOpts.css == 'sass') { %> 
+            },<% } else if (userOpts.css == 'sass') { %>
             sass: {
                 files: ['<%%= yeoman.app %>/_/css/**/*.{scss,sass}'], //Watch these files, and...
                 tasks: ['sass:server'] //run this operation when the files change.
             },<% } %>
             livereload: {
-                options: {livereload: 1025},
+                options: {livereload: 35729},
                 files: [<% if (userOpts.css == 'compass' || userOpts.css == 'sass') { %>
                     '.tmp/_/css/**/*.css',<% } else { %>
                     '<%%= yeoman.app %>/_/css/**/*.css',<% } %>
@@ -82,7 +83,7 @@ module.exports = function (grunt) {
             server: {  //Configuration options for the "server" task (i.e. during development).
                 options: {
                     /*keepalive: true,*/
-                    hostname: '<%%= yeoman.devURL %>',
+                    hostname: '<%%= yeoman.localURL %>',
                     port: '<%%= yeoman.devPort %>',
                     base: '<%%= yeoman.app %>', //Set the document root to the app folder.
                     router: '../router.php',
@@ -92,7 +93,7 @@ module.exports = function (grunt) {
             dist: { // The "server" task can pass in a "dist" arguement. Configure the server accordingly.
                 options: {
                     //keepalive: true,
-                    hostname: '<%%= yeoman.devURL %>',
+                    hostname: '<%%= yeoman.localURL %>',
                     port: '<%%= yeoman.devPort %>',
                     base: '<%%= yeoman.dist %>', //Set the document root to the dist folder.
                     router: '../router-dist.php',
@@ -109,7 +110,7 @@ module.exports = function (grunt) {
         //  "server" task is run.
         open: {
             server: {
-                path: 'http://<%%= yeoman.devURL %><% if (userOpts.devPort != 80) { %>:<%%= yeoman.devPort %><% } %>'
+                path: 'http://<%%= yeoman.localURL %><% if (userOpts.devPort != 80) { %>:<%%= yeoman.devPort %><% } %>'
             }
         },
 <% } %>
@@ -409,8 +410,9 @@ module.exports = function (grunt) {
                     cwd: '<%%= yeoman.app %>',
                     dest: '<%%= yeoman.dist %>',
                     src: [
-                        '*.{ico,png,txt}',
-                        '.htaccess',
+                        '*.{ico,png,txt}',<% if (!isIIS) {%>
+                        '.htaccess',<% } %>
+                        'web.config',
                         '_/img/**/*.{webp,gif}',
                         '_/foundation/images/**/*.{png,jpg,gif}',
                         '_/css/fonts/*',

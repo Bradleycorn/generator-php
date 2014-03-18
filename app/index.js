@@ -3,6 +3,16 @@ var util = require('util');
 var path = require('path');
 var yeoman = require('yeoman-generator');
 
+function CleanURL(url) {
+	if (url.indexOf('http://') === 0)
+		url = url.substr(7);
+	if (url.indexOf('https://') === 0)
+		url = url.substr(8);
+	if (url.indexOf('www.') === 0)
+		url = url.substr(4);
+	return url;
+}
+
 
 var PhpGenerator = module.exports = function PhpGenerator(args, options, config) {
   yeoman.generators.Base.apply(this, arguments);
@@ -42,11 +52,15 @@ PhpGenerator.prototype.askFor = function askFor() {
 
   var prompts = [{
     name: 'siteURL',
-    message: 'What\'s the URL for this site?',
+    message: 'What\'s the production URL for this site?',
   },
   {
     name: 'devURL',
-    message: 'and the dev URL?',
+    message: 'and the dev URL? (the seccweb url)',
+  },
+  {
+    name: 'localURL',
+    message: 'and your local URL? (on your local machine)',
   },
   {
     name: 'css',
@@ -56,7 +70,7 @@ PhpGenerator.prototype.askFor = function askFor() {
   {
     name: 'bootstrap',
     message: 'Which version of Twitter Bootstrap shall I include (none, 2.3.2, 3.0.0, etc)?',
-    default: '3.0.3'
+    default: '3.1.1'
   },
   {
     name: 'versioning',
@@ -66,8 +80,9 @@ PhpGenerator.prototype.askFor = function askFor() {
 
   this.prompt(prompts, function (props) {
     this.userOpts = {};
-    this.userOpts.siteURL = props.siteURL;
-    this.userOpts.devURL = props.devURL;
+    this.userOpts.siteURL = CleanURL(props.siteURL);
+    this.userOpts.devURL = CleanURL(props.devURL);
+    this.userOpts.localURL = CleanURL(props.localURL);
     this.userOpts.devPort = 80;
     this.userOpts.phpServer = false;
     this.userOpts.css = props.css.toLowerCase();
@@ -111,6 +126,11 @@ PhpGenerator.prototype.askFor = function askFor() {
     }
     this.paths.dev = 'dev';
     this.paths.dist = 'www';
+
+    this.urlParts = {};
+    this.urlParts.devHost = this.userOpts.devURL.substring(0, this.userOpts.devURL.lastIndexOf('.'));
+    this.urlParts.devURLext = props.devURL.substr(props.devURL.lastIndexOf('.') + 1);
+
     cb();
   }.bind(this));
 };
@@ -152,9 +172,8 @@ PhpGenerator.prototype.h5bp = function h5bp() {
   this.copy('favicon.ico', this.paths.dev + '/favicon.ico');
   this.copy('404.html', this.paths.dev + '/404.html');
   this.copy('robots.txt', this.paths.dev + '/robots.txt');
-  if (this.isIIS)
-    this.template('web.config', this.paths.dev + '/web.config');
-  else
+  this.template('web.config', this.paths.dev + '/web.config');
+  if (!this.isIIS)
     this.copy('htaccess', this.paths.dev + '/.htaccess');
 };
 
@@ -235,7 +254,7 @@ PhpGenerator.prototype.writeTail = function writeTail() {
 
   this.tailFile = this.tailFile.replace("<body>", "").replace("</body>", "");
   this.tailFile = this.tailFile.replace(/build:js/g, "build:js(" + this.paths.dev + ")");
-  this.tailFile = this.tailFile.replace("[devurl]", this.userOpts.devURL);
+  this.tailFile = this.tailFile.replace("[localurl]", this.userOpts.localURL);
   this.write(this.paths.dev + '/_/inc/tail.php', this.tailFile);
 };
 
