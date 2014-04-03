@@ -207,6 +207,7 @@ PhpGenerator.prototype.inc = function inc() {
 PhpGenerator.prototype.writeInit = function writeInit() {
   this.initFile = this.initFile.replace(/SiteName/g, this.userOpts.siteURL);
   this.initFile = this.initFile.replace(/DevSite/g, this.userOpts.devURL);
+  this.initFile = this.initFile.replace(/LocalSite/g, this.userOpts.localURL);
   this.write(this.paths.dev + '/_/inc/init.php', this.initFile);
 };
 

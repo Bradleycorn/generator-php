@@ -5,7 +5,7 @@
 
 	//Constants
 	define("FROM_EMAIL", "SiteName <webform@SiteName>");
-	
+
 	//Setup Variable for tracking VirtualPageViews in analytics.
 	$VirtualPageView = "";
 
@@ -22,10 +22,11 @@
 	//SET SERVER SPECIFIC VARIABLES AND CONSTANTS
 	switch ($ServerName) {
 		case 'DevSite':
+		case 'LocalSite':
 			define("CONTACT_EMAIL", "");
 			define("ANALYTICS_ID", "");
 			break;
-		
+
 		case 'SiteName':
 			define("CONTACT_EMAIL", "");
 			define("ANALYTICS_ID", "");
