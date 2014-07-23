@@ -328,9 +328,11 @@ module.exports = function (grunt) {
         //  files. This operation is included here for completeness,
         //  but is not used since the usemin task already minifies
         //  files for us.
-        /*uglify: {
-            dist: {}
-        },*/
+		uglify: {
+			options: {
+				mangle: false
+			}
+		},
 
 
         // IMAGEMIN
