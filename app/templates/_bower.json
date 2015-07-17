@@ -2,11 +2,11 @@
   "name": "<%= _.slugify(appname) %>",
   "version": "0.1.0",
   "dependencies": {
-  	"html5-boilerplate": "~4.2.0",<% if (userOpts.bootstrap != 'none') { %>
+    "html5-boilerplate": "~5.2.0",<% if (userOpts.bootstrap != 'none') { %>
     "bootstrap": "~<%=userOpts.bootstrap%>",<% if (userOpts.bootstrap != '2.3.2') { %>
-    "respond": "~1.3.0",<% }} %>
-    "modernizr": "~2.6.2",
-    "jquery": "~1.10.2"
+    "respond": "~1.4.2",<% }} %>
+    "modernizr": "~2.8.3",
+    "jquery": "~1.11.3"
   },
   "devDependencies": {}
 }

@@ -35,8 +35,8 @@ PhpGenerator.prototype.askFor = function askFor() {
   console.log('I\'ll be scaffolding out a php website for you.');
   console.log('Out of the box you\'re going to get:');
   console.log('- HTML5 Boilerplate');
-  console.log('- jQuery (v1.10)');
-  console.log('- Modernizr (v2.6.2)');
+  console.log('- jQuery (v1.11)');
+  console.log('- Modernizr (v2.8.3)');
 
   var prompts = [{
     name: 'siteURL',
@@ -64,8 +64,8 @@ PhpGenerator.prototype.askFor = function askFor() {
   },
   {
     name: 'bootstrap',
-    message: 'Which version of Twitter Bootstrap shall I include (none, 2.3.2, 3.0.0, etc)?',
-    default: '3.0.3'
+    message: 'Which version of Twitter Bootstrap shall I include (none, 2.3.2, 3.3.5, etc)?',
+    default: '3.3.5'
   },
   {
     type: 'confirm',
@@ -218,7 +218,7 @@ PhpGenerator.prototype.writeInit = function writeInit() {
 
 PhpGenerator.prototype.writeTail = function writeTail() {
   var tailScripts = [];
-  tailScripts.push('/_/bower_components/jquery/jquery.js');
+  tailScripts.push('/_/bower_components/jquery/dist/jquery.js');
   if (this.userOpts.bootstrap == 'none')
     tailScripts.push('/_/bower_components/html5-boilerplate/js/plugins.js');
   tailScripts.push('/_/js/functions.js');
@@ -307,7 +307,7 @@ PhpGenerator.prototype.writeIndex = function writeIndex() {
   var html = "        <h1>" + this.userOpts.siteURL + "</h1>";
   html += "        Your site is already wired up with:\n        <ul>\n";
   html += "            <li>Modernizr</li>\n";
-  html += "            <li>Jquery (1.10)</li>\n";
+  html += "            <li>Jquery (1.11)</li>\n";
   html += "            <li>HTML 5 Boilerplate</li>\n";
   if (this.userOpts.css == 'sass') 
     html += "            <li>Sass Stylesheets</li>\n";

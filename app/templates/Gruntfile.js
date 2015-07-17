@@ -246,15 +246,13 @@ module.exports = function (grunt) {
         // REV
         //  The rev operation will apply revision numbers to filenames (filename.ext will become filename.revision_no.ext)
         //  This is usually applied only for production on files for which we want to force browser cache expiration.
-        rev: {
+        filerev: {
             dist: {
-                files: {
-                    src: [
+                src: [
 <% if (userOpts.revScripts) { %>                        '<%%= yeoman.dist %>/_/js/**/*.js'<% } if (userOpts.revStyles || userOpts.revImages) { %>,<% } %>
 <% if (userOpts.revStyles) { %>                        '<%%= yeoman.dist %>/_/css/**/*.css'<% } if (userOpts.revImages) { %>,<% } %>
 <% if (userOpts.revImages) { %>                        '<%%= yeoman.dist %>/_/img/**/*.{png,jpg,jpeg,gif,webp}'<% } %>
-                    ]
-                }
+                ]
             }
         },
 
@@ -449,6 +447,19 @@ module.exports = function (grunt) {
                 'svgmin',
                 'htmlmin'
             ]
+        },
+
+        // KARMA
+        // Test settings
+        karma: {
+            unit: {
+                configFile: 'test/karma.conf.js',
+                singleRun: false
+            },
+            continuous: {
+                configFile: 'test/karma.conf.js',
+                singleRun: true
+            }
         }
     });
     // END INITCONFIG()
@@ -504,11 +515,20 @@ module.exports = function (grunt) {
         'cssmin',
         'uglify',
         'copy:dist',
-        'rev',
+        'filerev',
         'usemin',
         'processhtml:dist'
     ]);
 
+    // TEST
+    grunt.registerTask('test', function(target) {
+        if (!target) {
+            target = 'unit';
+        }
+        grunt.task.run([
+            'karma:' + target
+        ]);
+    });
 
     // DEFAULT
     //  The default task is run whenever no other task is provided. Here,
