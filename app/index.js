@@ -14,6 +14,22 @@ var PhpGenerator = module.exports = function PhpGenerator(args, options, config)
   this.isIIS = (options['iis']) ? true : false;
 
   this.on('end', function () {
+    this.invoke('karma:app', {
+      options: {
+        'skip-install': this.options['skip-install'],
+        'base-path': '../../',
+        'travis': true,
+        'app-files': 'app/_/js/**/*.js',
+        'test-files': [
+          'test/js/mock/**/*.js',
+          'test/js/spec/**/*.js'
+        ].join(','),
+        'config-path': './test/js',
+        'bower-components': 'jquery/dist/jquery.js',
+        'bower-components-path': 'app/_/bower_components'
+      }
+    });
+
     this.installDependencies({ skipInstall: options['skip-install'] });
   });
 
