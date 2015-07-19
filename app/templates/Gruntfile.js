@@ -168,7 +168,8 @@ module.exports = function (grunt) {
         inlinelint: {
             all: [
                 '<%%= yeoman.app %>/**/*{.html,.php}',
-                '!<%%= yeoman.app %>/_/bower_components/**/*{.html,.php}'
+                '!<%%= yeoman.app %>/_/bower_components/**/*{.html,.php}',
+                '!<%%= yeoman.app %>/_/inc/analytics.php'
             ]
         },
 
@@ -556,7 +557,7 @@ module.exports = function (grunt) {
     //  we'll run the build task by default.
     grunt.registerTask('default', [
         'jshint',
-        //'inlinelint',
+        'inlinelint',
         'phplint',
         'test:continuous',
         'build'
