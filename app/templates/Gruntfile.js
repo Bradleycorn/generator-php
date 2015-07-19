@@ -48,6 +48,13 @@ module.exports = function (grunt) {
                 files: ['<%%= yeoman.app %>/_/css/**/*.{scss,sass}'], //Watch these files, and...
                 tasks: ['sass:server'] //run this operation when the files change.
             },<% } %>
+            js: {
+              files: ['<%%= yeoman.app %>/_/js/**/*.js'],
+              tasks: ['jshint:all'],
+              options: {
+                livereload: 1025
+              }
+            },
             livereload: {
                 options: {livereload: 1025},
                 files: [<% if (userOpts.css == 'compass' || userOpts.css == 'sass') { %>
