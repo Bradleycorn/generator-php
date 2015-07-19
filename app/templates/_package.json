@@ -21,6 +21,8 @@
     "grunt-svgmin": "~2.0.1",
     "grunt-concurrent": "~2.0.0",
     "matchdep": "~0.3.0",
+    "grunt-composer": "~0.4.4",
+    "grunt-phpunit": "~0.3.6",
     "grunt-php": "~1.5.0",
     "grunt-lint-inline": "~0.4.4",
     "grunt-phplint": "~0.0.5",

@@ -175,6 +175,10 @@ PhpGenerator.prototype.projectfiles = function projectfiles() {
   this.template('gitignore', '.gitignore');
 };
 
+PhpGenerator.prototype.composer = function composer() {
+  this.template('composer.json');
+};
+
 PhpGenerator.prototype.app = function app() {
   this.mkdir(this.paths.dev);
   this.mkdir(this.paths.dev + '/_');
@@ -187,6 +191,14 @@ PhpGenerator.prototype.app = function app() {
     this.template('router.php', 'router.php');
     this.copy('router-dist.php', 'router-dist.php');
   }
+};
+
+PhpGenerator.prototype.test = function test() {
+  this.mkdir('test');
+  this.mkdir('test' + '/js');
+  this.mkdir('test' + '/js/spec');
+  this.mkdir('test' + '/php');
+  this.mkdir('test' + '/php/classes');
 };
 
 PhpGenerator.prototype.h5bp = function h5bp() {

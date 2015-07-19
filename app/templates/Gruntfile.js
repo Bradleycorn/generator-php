@@ -467,8 +467,20 @@ module.exports = function (grunt) {
                 configFile: 'test/js/karma.conf.js',
                 singleRun: true
             }
+        },
+
+        // PHPUNIT
+        phpunit: {
+            classes: {
+                dir: 'test/php/'
+            },
+            options: {
+                bin: 'vendor/bin/phpunit',
+                //bootstrap: 'test/php/phpunit.php',
+                colors: true
+            }
         }
-    });
+     });
     // END INITCONFIG()
 
 
@@ -533,7 +545,9 @@ module.exports = function (grunt) {
             target = 'unit';
         }
         grunt.task.run([
-            'karma:' + target
+            'karma:' + target,
+            'composer:update',
+            'phpunit'
         ]);
     });
 
@@ -544,7 +558,7 @@ module.exports = function (grunt) {
         'jshint',
         //'inlinelint',
         'phplint',
-        //'test',
+        'test:continuous',
         'build'
     ]);
 };
