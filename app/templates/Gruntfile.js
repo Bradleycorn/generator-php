@@ -48,6 +48,13 @@ module.exports = function (grunt) {
                 files: ['<%%= yeoman.app %>/_/css/**/*.{scss,sass}'], //Watch these files, and...
                 tasks: ['sass:server'] //run this operation when the files change.
             },<% } %>
+            js: {
+              files: ['<%%= yeoman.app %>/_/js/**/*.js'],
+              tasks: ['jshint:all'],
+              options: {
+                livereload: 1025
+              }
+            },
             livereload: {
                 options: {livereload: 1025},
                 files: [<% if (userOpts.css == 'compass' || userOpts.css == 'sass') { %>
@@ -161,7 +168,8 @@ module.exports = function (grunt) {
         inlinelint: {
             all: [
                 '<%%= yeoman.app %>/**/*{.html,.php}',
-                '!<%%= yeoman.app %>/_/bower_components/**/*{.html,.php}'
+                '!<%%= yeoman.app %>/_/bower_components/**/*{.html,.php}',
+                '!<%%= yeoman.app %>/_/inc/analytics.php'
             ]
         },
 
@@ -246,15 +254,13 @@ module.exports = function (grunt) {
         // REV
         //  The rev operation will apply revision numbers to filenames (filename.ext will become filename.revision_no.ext)
         //  This is usually applied only for production on files for which we want to force browser cache expiration.
-        rev: {
+        filerev: {
             dist: {
-                files: {
-                    src: [
+                src: [
 <% if (userOpts.revScripts) { %>                        '<%%= yeoman.dist %>/_/js/**/*.js'<% } if (userOpts.revStyles || userOpts.revImages) { %>,<% } %>
 <% if (userOpts.revStyles) { %>                        '<%%= yeoman.dist %>/_/css/**/*.css'<% } if (userOpts.revImages) { %>,<% } %>
 <% if (userOpts.revImages) { %>                        '<%%= yeoman.dist %>/_/img/**/*.{png,jpg,jpeg,gif,webp}'<% } %>
-                    ]
-                }
+                ]
             }
         },
 
@@ -449,8 +455,33 @@ module.exports = function (grunt) {
                 'svgmin',
                 'htmlmin'
             ]
+        },
+
+        // KARMA
+        // Test settings
+        karma: {
+            unit: {
+                configFile: 'test/js/karma.conf.js',
+                singleRun: false
+            },
+            continuous: {
+                configFile: 'test/js/karma.conf.js',
+                singleRun: true
+            }
+        },
+
+        // PHPUNIT
+        phpunit: {
+            classes: {
+                dir: 'test/php/'
+            },
+            options: {
+                bin: 'vendor/bin/phpunit',
+                //bootstrap: 'test/php/phpunit.php',
+                colors: true
+            }
         }
-    });
+     });
     // END INITCONFIG()
 
 
@@ -504,20 +535,31 @@ module.exports = function (grunt) {
         'cssmin',
         'uglify',
         'copy:dist',
-        'rev',
+        'filerev',
         'usemin',
         'processhtml:dist'
     ]);
 
+    // TEST
+    grunt.registerTask('test', function(target) {
+        if (!target) {
+            target = 'unit';
+        }
+        grunt.task.run([
+            'karma:' + target,
+            'composer:update',
+            'phpunit'
+        ]);
+    });
 
     // DEFAULT
     //  The default task is run whenever no other task is provided. Here,
     //  we'll run the build task by default.
     grunt.registerTask('default', [
         'jshint',
-        //'inlinelint',
+        'inlinelint',
         'phplint',
-        //'test',
+        'test:continuous',
         'build'
     ]);
 };

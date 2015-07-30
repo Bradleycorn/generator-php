@@ -14,6 +14,22 @@ var PhpGenerator = module.exports = function PhpGenerator(args, options, config)
   this.isIIS = (options['iis']) ? true : false;
 
   this.on('end', function () {
+    this.invoke('karma:app', {
+      options: {
+        'skip-install': this.options['skip-install'],
+        'base-path': '../../',
+        'travis': true,
+        'app-files': 'app/_/js/**/*.js',
+        'test-files': [
+          'test/js/mock/**/*.js',
+          'test/js/spec/**/*.js'
+        ].join(','),
+        'config-path': './test/js',
+        'bower-components': 'jquery/dist/jquery.js',
+        'bower-components-path': 'app/_/bower_components'
+      }
+    });
+
     this.installDependencies({ skipInstall: options['skip-install'] });
   });
 
@@ -35,8 +51,8 @@ PhpGenerator.prototype.askFor = function askFor() {
   console.log('I\'ll be scaffolding out a php website for you.');
   console.log('Out of the box you\'re going to get:');
   console.log('- HTML5 Boilerplate');
-  console.log('- jQuery (v1.10)');
-  console.log('- Modernizr (v2.6.2)');
+  console.log('- jQuery (v1.11)');
+  console.log('- Modernizr (v2.8.3)');
 
   var prompts = [{
     name: 'siteURL',
@@ -64,8 +80,8 @@ PhpGenerator.prototype.askFor = function askFor() {
   },
   {
     name: 'bootstrap',
-    message: 'Which version of Twitter Bootstrap shall I include (none, 2.3.2, 3.0.0, etc)?',
-    default: '3.0.3'
+    message: 'Which version of Twitter Bootstrap shall I include (none, 2.3.2, 3.3.5, etc)?',
+    default: '3.3.5'
   },
   {
     type: 'confirm',
@@ -159,6 +175,10 @@ PhpGenerator.prototype.projectfiles = function projectfiles() {
   this.template('gitignore', '.gitignore');
 };
 
+PhpGenerator.prototype.composer = function composer() {
+  this.template('composer.json');
+};
+
 PhpGenerator.prototype.app = function app() {
   this.mkdir(this.paths.dev);
   this.mkdir(this.paths.dev + '/_');
@@ -171,6 +191,14 @@ PhpGenerator.prototype.app = function app() {
     this.template('router.php', 'router.php');
     this.copy('router-dist.php', 'router-dist.php');
   }
+};
+
+PhpGenerator.prototype.test = function test() {
+  this.mkdir('test');
+  this.mkdir('test' + '/js');
+  this.mkdir('test' + '/js/spec');
+  this.mkdir('test' + '/php');
+  this.mkdir('test' + '/php/classes');
 };
 
 PhpGenerator.prototype.h5bp = function h5bp() {
@@ -218,7 +246,7 @@ PhpGenerator.prototype.writeInit = function writeInit() {
 
 PhpGenerator.prototype.writeTail = function writeTail() {
   var tailScripts = [];
-  tailScripts.push('/_/bower_components/jquery/jquery.js');
+  tailScripts.push('/_/bower_components/jquery/dist/jquery.js');
   if (this.userOpts.bootstrap == 'none')
     tailScripts.push('/_/bower_components/html5-boilerplate/js/plugins.js');
   tailScripts.push('/_/js/functions.js');
@@ -307,7 +335,7 @@ PhpGenerator.prototype.writeIndex = function writeIndex() {
   var html = "        <h1>" + this.userOpts.siteURL + "</h1>";
   html += "        Your site is already wired up with:\n        <ul>\n";
   html += "            <li>Modernizr</li>\n";
-  html += "            <li>Jquery (1.10)</li>\n";
+  html += "            <li>Jquery (1.11)</li>\n";
   html += "            <li>HTML 5 Boilerplate</li>\n";
   if (this.userOpts.css == 'sass') 
     html += "            <li>Sass Stylesheets</li>\n";
