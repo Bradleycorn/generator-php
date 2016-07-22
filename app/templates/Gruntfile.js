@@ -43,7 +43,7 @@ module.exports = function (grunt) {
             compass: {
                 files: ['<%%= yeoman.app %>/_/css/**/*.{scss,sass}'], //Watch these files, and...
                 tasks: ['compass:server'] //run this operation when the files change.
-            },<% } else if (userOpts.css == 'sass') { %> 
+            },<% } else if (userOpts.css == 'sass') { %>
             sass: {
                 files: ['<%%= yeoman.app %>/_/css/**/*.{scss,sass}'], //Watch these files, and...
                 tasks: ['sass:server'] //run this operation when the files change.
